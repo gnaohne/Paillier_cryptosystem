@@ -13,7 +13,7 @@ BigInteger::BigInteger(const string &s) {
     string binary = s;
     digits.clear();
     sign = 1;
-    if (s[0] == '-') {
+    if (binary[0] == '-') {
         sign = -1;
         binary = binary.substr(1);
     }
@@ -141,43 +141,41 @@ BigInteger BigInteger::operator+(const BigInteger &a) const {
         ans.digits[max(n, m)] = carry;
         ans.trim();
         return ans;
-    } else {
-        if (this->abs() >= a.abs()) {
-            ans.sign = sign;
-            ll carry = 0;
-            ll sum = 0;
-            for (int i = 0; i < n; i++) {
-                sum = carry + digits[i];
-                if (i < m) sum -= a.digits[i];
-                if (sum < 0) {
-                    sum += BASE;
-                    carry = -1;
-                } else {
-                    carry = 0;
-                }
-                ans.digits[i] = sum;
+    } 
+    if (this->abs() >= a.abs()) {
+        ans.sign = sign;
+        ll carry = 0;
+        ll sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum = carry + digits[i];
+            if (i < m) sum -= a.digits[i];
+            if (sum < 0) {
+                sum += BASE;
+                carry = -1;
+            } else {
+                carry = 0;
             }
-            ans.trim();
-            return ans;
-        } else {
-            ans.sign = a.sign;
-            int carry = 0;
-            ll sum = 0;
-            for (int i = 0; i < m; i++) {
-                sum = carry + a.digits[i];
-                if (i < n) sum -= digits[i];
-                if (sum < 0) {
-                    sum += BASE;
-                    carry = -1;
-                } else {
-                    carry = 0;
-                }
-                ans.digits[i] = sum;
-            }
-            ans.trim();
-            return ans;
+            ans.digits[i] = sum;
         }
+        ans.trim();
+        return ans;
     }
+    ans.sign = a.sign;
+    int carry = 0;
+    ll sum = 0;
+    for (int i = 0; i < m; i++) {
+        sum = carry + a.digits[i];
+        if (i < n) sum -= digits[i];
+        if (sum < 0) {
+            sum += BASE;
+            carry = -1;
+        } else {
+            carry = 0;
+        }
+        ans.digits[i] = sum;
+    }
+    ans.trim();
+    return ans;
 }
 
 BigInteger BigInteger::operator-(const BigInteger &a) const {
@@ -189,6 +187,10 @@ BigInteger BigInteger::operator-(const BigInteger &a) const {
 void BigInteger::trim() {
     while (!digits.empty() && !digits.back()) {
         digits.pop_back();
+    }
+    if (digits.empty()) {
+        digits.push_back(0);
+        sign = 1;
     }
 }
 
@@ -467,7 +469,7 @@ auto divide(const BigInteger &a, const BigInteger &b) {
         BigInteger quotient;
         BigInteger remainder;
     };
-
+    
     if (b.is_zero()) {
         throw "Divide by zero";
     }
@@ -483,20 +485,26 @@ auto divide(const BigInteger &a, const BigInteger &b) {
     int sign_y = b.getSign();
 
     res answer;
-    answer.quotient = BigInteger();
+    answer.quotient = BigInteger("0");
     answer.remainder = x;
 
-    int shift = BIT_PER_DIGIT * (x.size() - y.size() + 1);
+    int shift = BIT_PER_DIGIT * (x.size() - y.size());
+
     while (shift >= 0) {
         BigInteger shiftedY = y << shift;
-        if (answer.remainder >= shiftedY) {
+        while (answer.remainder >= shiftedY) {
             answer.remainder = answer.remainder - shiftedY;
             answer.quotient = answer.quotient + (BigInteger("1") << shift);
         }
         shift--;
     }
-
-    answer.quotient.setSign(sign_x * sign_y);
+    
+    if(answer.quotient.is_zero()) {
+        answer.quotient = BigInteger("0");
+    }
+    else {
+        answer.quotient.setSign(sign_x * sign_y);
+    }
     answer.remainder.setSign(sign_x);
 
     return answer;
