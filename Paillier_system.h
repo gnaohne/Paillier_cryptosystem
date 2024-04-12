@@ -9,4 +9,4 @@ auto keyGen();
 
 BigInteger random_in_Zn2(BigInteger n);
 
-#endif PAILLIER_CRYPTOSYSTEM_H
+#endif //PAILLIER_CRYPTOSYSTEM_H

@@ -100,7 +100,7 @@ auto bezout(const BigInteger &x, const BigInteger &y); // => tu day co gcd roi
 
 auto divide(const BigInteger &a, const BigInteger &b);
 
-BigInteger lcm(BigInteger &x, BigInteger &y);
+BigInteger lcm(const BigInteger &x, const BigInteger &y);
 
 bool Miller_Rabin_check(const BigInteger &n);
 

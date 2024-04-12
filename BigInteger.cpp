@@ -403,7 +403,7 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
     temp_x = temp_x >> i;
 
     temp_y = temp_y >> j;
-    
+
     BigInteger u(x);
     BigInteger v(y);
 
@@ -503,7 +503,7 @@ auto divide(const BigInteger &a, const BigInteger &b) {
     return answer;
 }
 
-BigInteger lcm(BigInteger &x, BigInteger &y) {
+BigInteger lcm(const BigInteger &x, const BigInteger &y) {
     BigInteger temp_x(x), temp_y(y);
     BigInteger xy = temp_x * temp_y;
     BigInteger gcd = bezout(x, y).d;

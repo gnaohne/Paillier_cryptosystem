@@ -14,12 +14,14 @@ int main() {
     // std::chrono::duration<double> duration = end - start;
     // cout << "Time: " << duration.count() << "s" << endl;
 
-    BigInteger p = generate_large_prime(512);
+    auto key = keyGen();
+    cout << "n: " << key.n.toString() << endl;
+    cout << "g: " << key.g.toString() << endl;
+    cout << "d: " << key.d.toString() << endl;
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
     cout << "Time: " << duration.count() << "s" << endl;
 
-    cout << "Prime: " << p.toString() << endl;
     return 0;
 }
