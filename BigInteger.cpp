@@ -298,6 +298,12 @@ BigInteger BigInteger::powMod(const BigInteger &a, const BigInteger &mod) const 
     return res;
 }
 
+ll getFirstKBits(ll x, int k) {
+    ll mask = (1LL << k) - 1;
+    ll res = x & mask;
+    return res;
+}
+
 BigInteger BigInteger::operator>>(int i) { 
     if (i < 0) {
         throw "Shift right must be positive";
@@ -329,31 +335,29 @@ BigInteger BigInteger::operator>>(int i) {
 }
 
 BigInteger BigInteger::operator<<(int i) {
-    if (i < 0) {
-        throw "Shift left must be positive";
-    }
-
     if (i == 0) return *this;
 
+    int shiftUnits = i / BIT_PER_DIGIT;
+    int shiftBits = i % BIT_PER_DIGIT;
+    int shiftNe = BIT_PER_DIGIT - shiftBits;
 
-    ll carry = 0;
-    ll sum = 0;
-    int n = size();
     BigInteger ans;
     ans.sign = sign;
-    ans.digits.resize(n + i);
-    for (int j = 0; j < n; j++) {
-        if (j == 0) {
-            sum = digits[j] << i;
-            ans.digits[j] = sum % BASE;
-            carry = sum / BASE;
+    ans.digits.resize(digits.size() + shiftUnits + 1, 0);
+
+    int carry = 0;
+    ll sum = 0;
+    for (int j = 0; j < digits.size(); j++) {
+        ll temp = getFirstKBits(digits[j], shiftNe);
+        ans.digits[j + shiftUnits] |= (temp << shiftBits);
+        temp = (digits[j] >> shiftNe);
+        if (j == digits.size() - 1) {
+            ans.digits[j + shiftUnits + 1] = temp;
         } else {
-            sum = digits[j] + carry;
-            ans.digits[j] = sum % BASE;
-            carry = sum / BASE;
+            ans.digits[j + shiftUnits + 1] = temp | carry;
+            carry = 0;
         }
     }
-    ans.digits[n] = carry;
     ans.trim();
     return ans;
 }
@@ -464,6 +468,15 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
     return Ans{a, b, d};
 }
 
+int msbPosition(ll x) {
+    int res = 0;
+    while (x > 0) {
+        x >>= 1;
+        res++;
+    }
+    return res;
+}
+
 auto divide(const BigInteger &a, const BigInteger &b) {
     struct res {
         BigInteger quotient;
@@ -488,17 +501,32 @@ auto divide(const BigInteger &a, const BigInteger &b) {
     answer.quotient = BigInteger("0");
     answer.remainder = x;
 
-    int shift = BIT_PER_DIGIT * (x.size() - y.size());
+    int n = x.size();
+    int m = y.size();
 
-    while (shift >= 0) {
-        BigInteger shiftedY = y << shift;
-        while (answer.remainder >= shiftedY) {
-            answer.remainder = answer.remainder - shiftedY;
-            answer.quotient = answer.quotient + (BigInteger("1") << shift);
-        }
-        shift--;
+    if (n < m) {
+        return res{BigInteger("0"), x};
     }
-    
+
+    // code to divide two numbers
+    int shift = BIT_PER_DIGIT + 1;
+    while (x >= y) {
+        int msbX = 0, msbY = 0;
+        msbX = msbPosition(x.getDigits().back());
+        msbY = msbPosition(y.getDigits().back());
+        int cShift = msbX - msbY + (x.size() - y.size()) * BIT_PER_DIGIT;
+        shift = min(shift - 1, cShift);
+
+        BigInteger shiftedY = y << shift;
+        while (shiftedY > x)
+            shift--, shiftedY = y << shift;
+
+        x = x - shiftedY;
+        answer.quotient = answer.quotient + (BigInteger("1") << shift);
+    }
+
+    answer.remainder = x;
+
     if(answer.quotient.is_zero()) {
         answer.quotient = BigInteger("0");
     }

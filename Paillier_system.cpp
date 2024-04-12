@@ -40,8 +40,10 @@ auto keyGen()
     
     // d = lcm((p-1),(q-1))
     ans.d = lcm(p - BigInteger(1), q - BigInteger(1));
+    cout << "d: " << ans.d.toString() << endl;
 
     // g = random in Zn^2
+    cout << "Generating g..." << endl;
     ans.g = random_in_Zn2(ans.n);
 
     // mu = (L(g^d mod n2))^-1 (mod n) with L(x)=(x-1)/n
@@ -80,6 +82,7 @@ BigInteger random_in_Zn2(BigInteger n)
 
     while(gcd_g_n2 != BigInteger(1))
     {
+        cout << "Generating g..." << endl;
         binary = "1";
 
         for(int i = 1; i < bit_size; i++)
