@@ -2,13 +2,15 @@
 
 auto keyGen()
 {
-    struct keyPair
+    struct key
     {
-        BigInteger e;
+        BigInteger n;
+        BigInteger g;
+        
         BigInteger d;
     };
     
-    keyPair ans;
+    key ans;
 
     BigInteger p = generate_large_prime(KEY_SIZE);
     BigInteger q = generate_large_prime(KEY_SIZE);
@@ -19,12 +21,12 @@ auto keyGen()
     }
 
 
-    BigInteger n = p * q;
+    ans.n = p * q;
 
     BigInteger phi = (p - BigInteger(1)) * (q - BigInteger(1));
 
     // i wanna check gcd(n,(p-1)(q-1)) == 1 use bezout function
-    BigInteger gcd_n_phin = bezout(n, phi).d;
+    BigInteger gcd_n_phin = bezout(ans.n, phi).d;
 
     while(gcd_n_phin != BigInteger(1))
     {
@@ -35,9 +37,15 @@ auto keyGen()
     ans.d = lcm(p - BigInteger(1), q - BigInteger(1));
 
     // g = random in Zn^2
-    BigInteger g = random_in_Zn2(n);
-    
+    ans.g = random_in_Zn2(ans.n);
 
+    // mu = (g^d mod n2)^-1 (mod n)
+    
+    BigInteger g_d = ans.g.powMod(ans.d, ans.n * ans.n);
+
+    BigInteger mu = mod_inverse(g_d, ans.n);
+
+    return ans;
 }
 
 BigInteger random_in_Zn2(BigInteger n)
