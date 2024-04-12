@@ -106,5 +106,6 @@ bool Miller_Rabin_check(const BigInteger &n);
 
 string hex_to_bin(const string &hex);
 
+BigInteger generate_large_prime(int bit_length);
 
 #endif //PAILLIER_CRYPTOSYSTEM_BIGINTEGER_H

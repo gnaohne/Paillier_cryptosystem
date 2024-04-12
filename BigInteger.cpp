@@ -610,3 +610,23 @@ string hex_to_bin(const string &hex) {
     }
     return binary;
 }
+
+BigInteger generate_large_prime(int bit_length)
+{
+    srand(time(0));
+    string binary = "1";
+    for (int i = 1; i < bit_length - 1; i++) {
+        binary += (rand() % 2) ? '1' : '0';
+    }
+    binary += "1";
+    BigInteger n(binary);
+    while (!Miller_Rabin_check(n)) {
+        binary = "1";
+        for (int i = 1; i < bit_length - 1; i++) {
+            binary += (rand() % 2) ? '1' : '0';
+        }
+        binary += "1";
+        n = BigInteger(binary);
+    }
+    return n;
+}
