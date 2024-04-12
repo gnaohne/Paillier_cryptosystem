@@ -317,12 +317,9 @@ BigInteger BigInteger::operator>>(int i) {
             carry = digits[j] % value;
             ans.digits[j] = digits[j] >> i;
         } else {
-            sum = digits[i];
-            if (carry > 0) {
-                sum += BASE * carry;
-            }
+            sum = digits[j] + BASE * carry;
             carry = sum % value;
-            ans.digits[i] = sum >> i;
+            ans.digits[j] = sum >> i;
         }
     }
     ans.trim();
