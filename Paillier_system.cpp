@@ -9,10 +9,13 @@ auto keyGen()
         
         BigInteger d;
     };
-    
+    cout << "Generating key..." << endl;
     key ans;
 
+    cout << "Generating p..." << endl;
     BigInteger p = generate_large_prime(KEY_SIZE);
+    
+    cout << "Generating q..." << endl;
     BigInteger q = generate_large_prime(KEY_SIZE);
 
     while(q == p)
@@ -20,6 +23,8 @@ auto keyGen()
         q = generate_large_prime(KEY_SIZE);
     }
 
+    cout << "p: " << p.toString() << endl;
+    cout << "q: " << q.toString() << endl;
 
     ans.n = p * q;
 
@@ -39,11 +44,13 @@ auto keyGen()
     // g = random in Zn^2
     ans.g = random_in_Zn2(ans.n);
 
-    // mu = (g^d mod n2)^-1 (mod n)
+    // mu = (L(g^d mod n2))^-1 (mod n) with L(x)=(x-1)/n
     
     BigInteger g_d = ans.g.powMod(ans.d, ans.n * ans.n);
 
-    BigInteger mu = mod_inverse(g_d, ans.n);
+    BigInteger L = divide((g_d - BigInteger(1)), ans.n).quotient;
+
+    BigInteger mu = mod_inverse(L, ans.n);
 
     return ans;
 }
@@ -55,6 +62,9 @@ BigInteger random_in_Zn2(BigInteger n)
     // n = p*q => n^2 = p^2 * q^2 => bit(n^2) = 2*bit(n)
     // for example p and q is 128 bit so n is 256 bit => n^2 is 512 bit
     // so i wanna g is 512 bit and gcd(g,n^2) = 1
+    
+    auto start = chrono::high_resolution_clock::now();
+
     int bit_size = KEY_SIZE * 4; 
 
     string binary = "1";
@@ -82,5 +92,9 @@ BigInteger random_in_Zn2(BigInteger n)
         gcd_g_n2 = bezout(g, n * n).d;
     }
 
+    auto end = chrono::high_resolution_clock::now();
+    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
+
+    cout << "Time to generate g: " << duration.count() << " ms" << endl;
     return g;
 }

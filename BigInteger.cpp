@@ -460,7 +460,6 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
     b.setSign(b.getSign() * sign_y);
 
     return Ans{a, b, d};
-
 }
 
 auto divide(const BigInteger &a, const BigInteger &b) {
@@ -636,9 +635,16 @@ BigInteger generate_large_prime(int bit_length)
 
 BigInteger mod_inverse(const BigInteger &a, const BigInteger &n)
 {
+    auto start = chrono::high_resolution_clock::now();
+
     BigInteger x = bezout(a, n).a;
     if (x.getSign() == -1) {
         x = x + n;
     }
+
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> duration = end - start;
+    cout << "Time calculate modulo inverse: " << duration.count() << "s" << endl;
+
     return x;
 }

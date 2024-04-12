@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <chrono>
 
 using namespace std;
 
@@ -96,7 +97,7 @@ public:
     BigInteger powMod(const BigInteger &a, const BigInteger &mod) const;
 };
 
-auto bezout(const BigInteger &x, const BigInteger &y); // => tu day co gcd roi
+auto bezout(const BigInteger &x, const BigInteger &y);
 
 auto divide(const BigInteger &a, const BigInteger &b);
 

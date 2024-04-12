@@ -2,6 +2,7 @@
 #define PAILLIER_CRYPTOSYSTEM_H
 
 #include "BigInteger.h"
+#include <chrono>
 
 #define KEY_SIZE 128
 
