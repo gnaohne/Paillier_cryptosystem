@@ -365,11 +365,13 @@ BigInteger BigInteger::operator%=(const BigInteger &a) {
     return *this;
 }
 
-auto bezout(BigInteger &x, BigInteger &y) {
+auto bezout(const BigInteger &x, const BigInteger &y) {
     struct Ans {
         BigInteger a, b;
         BigInteger d; // Bezout => ax + by = gcd(x,y) = d
     };
+
+    BigInteger temp_x, temp_y;
 
     if (x.is_zero()) {
         return Ans{BigInteger("0"), BigInteger("1"), y};
@@ -381,11 +383,11 @@ auto bezout(BigInteger &x, BigInteger &y) {
     int sign_x = x.getSign();
     int sign_y = y.getSign();
 
-    x = x.abs();
-    y = y.abs();
+    temp_x = x.abs();
+    temp_y = y.abs();
 
-    string x_binary = x.toString();
-    string y_binary = y.toString();
+    string x_binary = temp_x.toString();
+    string y_binary = temp_y.toString();
     reverse(x_binary.begin(), x_binary.end());
     reverse(y_binary.begin(), y_binary.end());
 
@@ -398,9 +400,10 @@ auto bezout(BigInteger &x, BigInteger &y) {
         j++;
     }
 
-    x = x >> i;
+    temp_x = temp_x >> i;
 
-    y = y >> j;
+    temp_y = temp_y >> j;
+    
     BigInteger u(x);
     BigInteger v(y);
 
@@ -629,4 +632,13 @@ BigInteger generate_large_prime(int bit_length)
         n = BigInteger(binary);
     }
     return n;
+}
+
+BigInteger mod_inverse(const BigInteger &a, const BigInteger &n)
+{
+    BigInteger x = bezout(a, n).a;
+    if (x.getSign() == -1) {
+        x = x + n;
+    }
+    return x;
 }

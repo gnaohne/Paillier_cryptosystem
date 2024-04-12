@@ -96,7 +96,7 @@ public:
     BigInteger powMod(const BigInteger &a, const BigInteger &mod) const;
 };
 
-auto bezout(BigInteger &x, BigInteger &y); // => tu day co gcd roi
+auto bezout(const BigInteger &x, const BigInteger &y); // => tu day co gcd roi
 
 auto divide(const BigInteger &a, const BigInteger &b);
 
@@ -107,5 +107,7 @@ bool Miller_Rabin_check(const BigInteger &n);
 string hex_to_bin(const string &hex);
 
 BigInteger generate_large_prime(int bit_length);
+
+BigInteger mod_inverse(const BigInteger &a, const BigInteger &n);
 
 #endif //PAILLIER_CRYPTOSYSTEM_BIGINTEGER_H
