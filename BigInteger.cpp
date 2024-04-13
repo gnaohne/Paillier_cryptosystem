@@ -13,7 +13,7 @@ BigInteger::BigInteger(const string &s) {
     string binary = s;
     digits.clear();
     sign = 1;
-    if (s[0] == '-') {
+    if (binary[0] == '-') {
         sign = -1;
         binary = binary.substr(1);
     }
@@ -141,43 +141,41 @@ BigInteger BigInteger::operator+(const BigInteger &a) const {
         ans.digits[max(n, m)] = carry;
         ans.trim();
         return ans;
-    } else {
-        if (this->abs() >= a.abs()) {
-            ans.sign = sign;
-            ll carry = 0;
-            ll sum = 0;
-            for (int i = 0; i < n; i++) {
-                sum = carry + digits[i];
-                if (i < m) sum -= a.digits[i];
-                if (sum < 0) {
-                    sum += BASE;
-                    carry = -1;
-                } else {
-                    carry = 0;
-                }
-                ans.digits[i] = sum;
+    } 
+    if (this->abs() >= a.abs()) {
+        ans.sign = sign;
+        ll carry = 0;
+        ll sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum = carry + digits[i];
+            if (i < m) sum -= a.digits[i];
+            if (sum < 0) {
+                sum += BASE;
+                carry = -1;
+            } else {
+                carry = 0;
             }
-            ans.trim();
-            return ans;
-        } else {
-            ans.sign = a.sign;
-            int carry = 0;
-            ll sum = 0;
-            for (int i = 0; i < m; i++) {
-                sum = carry + a.digits[i];
-                if (i < n) sum -= digits[i];
-                if (sum < 0) {
-                    sum += BASE;
-                    carry = -1;
-                } else {
-                    carry = 0;
-                }
-                ans.digits[i] = sum;
-            }
-            ans.trim();
-            return ans;
+            ans.digits[i] = sum;
         }
+        ans.trim();
+        return ans;
     }
+    ans.sign = a.sign;
+    int carry = 0;
+    ll sum = 0;
+    for (int i = 0; i < m; i++) {
+        sum = carry + a.digits[i];
+        if (i < n) sum -= digits[i];
+        if (sum < 0) {
+            sum += BASE;
+            carry = -1;
+        } else {
+            carry = 0;
+        }
+        ans.digits[i] = sum;
+    }
+    ans.trim();
+    return ans;
 }
 
 BigInteger BigInteger::operator-(const BigInteger &a) const {
@@ -189,6 +187,10 @@ BigInteger BigInteger::operator-(const BigInteger &a) const {
 void BigInteger::trim() {
     while (!digits.empty() && !digits.back()) {
         digits.pop_back();
+    }
+    if (digits.empty()) {
+        digits.push_back(0);
+        sign = 1;
     }
 }
 
@@ -303,23 +305,37 @@ BigInteger BigInteger::operator>>(int i) {
 
     if (i == 0) return *this;
 
-    int value = 1 << (i);
+    ll value = (ll)1 << (i);
+    value--; // set i bits to 1
 
     int n = size();
     BigInteger ans;
     ans.sign = sign;
     ans.digits.resize(n);
 
-    int carry = 0;
-    ll sum = 0;
+    int shilfS = i / BIT_PER_DIGIT;
+    // remove shilfS last digits    
+    for (int j = 0; j < n; j++) {
+        if (j + shilfS < n) {
+            ans.digits[j] = digits[j + shilfS];
+        }
+    }
+    
+    int shilf = i % BIT_PER_DIGIT;
+    ll carry = 0;
     for (int j = n - 1; j >= 0; j--) {
+        ans.digits[j] = ans.digits[j] & (1ll << BIT_PER_DIGIT - 1);
         if (j == n - 1) {
-            carry = digits[j] % value;
-            ans.digits[j] = digits[j] >> i;
+            carry = digits[j] & value; // get the last i bits
+            ans.digits[j] = digits[j] >> shilf;
         } else {
-            sum = digits[j] + BASE * carry;
-            carry = sum % value;
-            ans.digits[j] = sum >> i;
+            // n = n1{101} n2{010}
+            // n >> 1 = n1{10} n2{101}
+
+            ll temp = carry;
+            carry = digits[j] & value;
+            // put the last i bits of the previous number to the first i bits of the current number
+            ans.digits[j] = (digits[j] >> shilf) | (temp << (BIT_PER_DIGIT - shilf)); 
         }
     }
     ans.trim();
@@ -327,12 +343,11 @@ BigInteger BigInteger::operator>>(int i) {
 }
 
 BigInteger BigInteger::operator<<(int i) {
-    if (i < 0) {
+    if(i < 0) {
         throw "Shift left must be positive";
     }
-
+    
     if (i == 0) return *this;
-
 
     ll carry = 0;
     ll sum = 0;
@@ -342,13 +357,18 @@ BigInteger BigInteger::operator<<(int i) {
     ans.digits.resize(n + i);
     for (int j = 0; j < n; j++) {
         if (j == 0) {
-            sum = digits[j] << i;
-            ans.digits[j] = sum % BASE;
-            carry = sum / BASE;
+            // i = 2
+            // n = n1{10} n2{011} 
+            // n << 2 = n1{1} n2{001} n3{100} 
+            
+            carry = digits[j] >> (BIT_PER_DIGIT - i); // get the first i bits
+            carry = carry & ((1ll << i) - 1); // set the first i bits to 1
+            ans.digits[j] = digits[j] << i; 
         } else {
-            sum = digits[j] + carry;
-            ans.digits[j] = sum % BASE;
-            carry = sum / BASE;
+            ll temp = carry;
+            carry = digits[j] >> (BIT_PER_DIGIT - i);
+            carry = carry & ((1ll << i) - 1);
+            ans.digits[j] = (digits[j] << i) | temp;
         }
     }
     ans.digits[n] = carry;
@@ -460,7 +480,17 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
     b.setSign(b.getSign() * sign_y);
 
     return Ans{a, b, d};
+}
 
+int msbPosition(ll x)
+{
+    int res = 0;
+    while (x > 0)
+    {
+        x >>= 1;
+        res++;
+    }
+    return res;
 }
 
 auto divide(const BigInteger &a, const BigInteger &b) {
@@ -468,7 +498,7 @@ auto divide(const BigInteger &a, const BigInteger &b) {
         BigInteger quotient;
         BigInteger remainder;
     };
-
+    
     if (b.is_zero()) {
         throw "Divide by zero";
     }
@@ -484,20 +514,42 @@ auto divide(const BigInteger &a, const BigInteger &b) {
     int sign_y = b.getSign();
 
     res answer;
-    answer.quotient = BigInteger();
+    answer.quotient = BigInteger("0");
     answer.remainder = x;
 
-    int shift = BIT_PER_DIGIT * (x.size() - y.size() + 1);
-    while (shift >= 0) {
-        BigInteger shiftedY = y << shift;
-        if (answer.remainder >= shiftedY) {
-            answer.remainder = answer.remainder - shiftedY;
-            answer.quotient = answer.quotient + (BigInteger("1") << shift);
-        }
-        shift--;
+    int n = x.size();
+    int m = y.size();
+
+    if (x < y) { 
+    // 9 : 10 => 0 : 9
+    // -9 : 10 => 0 : -9
+    // 9 : -10 => 0 : 9
+        return res{BigInteger("0"), a};
     }
 
-    answer.quotient.setSign(sign_x * sign_y);
+    while(answer.remainder >=y) {
+        
+        int msb_x = msbPosition(answer.remainder.digits.back());
+        int msb_y = msbPosition(y.digits.back());
+        int shift = msb_x - msb_y + (int)(answer.remainder.size() - y.size()) * BIT_PER_DIGIT;
+
+        BigInteger shifted_y = y << shift;
+
+        while (answer.remainder < shifted_y) {
+            shift--;
+            shifted_y = y << shift;
+        }
+
+        answer.remainder = answer.remainder - shifted_y;
+        answer.quotient = answer.quotient + (BigInteger("1") << shift);
+    }
+    
+    if(answer.quotient.is_zero()) {
+        answer.quotient = BigInteger("0");
+    }
+    else {
+        answer.quotient.setSign(sign_x * sign_y);
+    }
     answer.remainder.setSign(sign_x);
 
     return answer;
@@ -526,7 +578,7 @@ bool Miller_Rabin_check(const BigInteger &n) {
 
     int Primes_size = sizeof(Primes) / sizeof(Primes[0]);
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
         BigInteger a((ll)Primes[rand() % Primes_size]);
 
         BigInteger x = a.powMod(d, n);
@@ -636,9 +688,16 @@ BigInteger generate_large_prime(int bit_length)
 
 BigInteger mod_inverse(const BigInteger &a, const BigInteger &n)
 {
+    auto start = chrono::high_resolution_clock::now();
+
     BigInteger x = bezout(a, n).a;
     if (x.getSign() == -1) {
         x = x + n;
     }
+
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> duration = end - start;
+    cout << "Time calculate modulo inverse: " << duration.count() << "s" << endl;
+
     return x;
 }
