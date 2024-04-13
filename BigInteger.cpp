@@ -298,12 +298,6 @@ BigInteger BigInteger::powMod(const BigInteger &a, const BigInteger &mod) const 
     return res;
 }
 
-ll getFirstKBits(ll x, int k) {
-    ll mask = (1LL << k) - 1;
-    ll res = x & mask;
-    return res;
-}
-
 BigInteger BigInteger::operator>>(int i) { 
     if (i < 0) {
         throw "Shift right must be positive";
@@ -311,23 +305,37 @@ BigInteger BigInteger::operator>>(int i) {
 
     if (i == 0) return *this;
 
-    int value = 1 << (i);
+    ll value = (ll)1 << (i);
+    value--; // set i bits to 1
 
     int n = size();
     BigInteger ans;
     ans.sign = sign;
     ans.digits.resize(n);
 
-    int carry = 0;
-    ll sum = 0;
+    int shilfS = i / BIT_PER_DIGIT;
+    // remove shilfS last digits    
+    for (int j = 0; j < n; j++) {
+        if (j + shilfS < n) {
+            ans.digits[j] = digits[j + shilfS];
+        }
+    }
+    
+    int shilf = i % BIT_PER_DIGIT;
+    ll carry = 0;
     for (int j = n - 1; j >= 0; j--) {
+        ans.digits[j] = ans.digits[j] & (1ll << BIT_PER_DIGIT - 1);
         if (j == n - 1) {
-            carry = digits[j] % value;
-            ans.digits[j] = digits[j] >> i;
+            carry = digits[j] & value; // get the last i bits
+            ans.digits[j] = digits[j] >> shilf;
         } else {
-            sum = digits[j] + BASE * carry;
-            carry = sum % value;
-            ans.digits[j] = sum >> i;
+            // n = n1{101} n2{010}
+            // n >> 1 = n1{10} n2{101}
+
+            ll temp = carry;
+            carry = digits[j] & value;
+            // put the last i bits of the previous number to the first i bits of the current number
+            ans.digits[j] = (digits[j] >> shilf) | (temp << (BIT_PER_DIGIT - shilf)); 
         }
     }
     ans.trim();
@@ -335,29 +343,35 @@ BigInteger BigInteger::operator>>(int i) {
 }
 
 BigInteger BigInteger::operator<<(int i) {
+    if(i < 0) {
+        throw "Shift left must be positive";
+    }
+    
     if (i == 0) return *this;
 
-    int shiftUnits = i / BIT_PER_DIGIT;
-    int shiftBits = i % BIT_PER_DIGIT;
-    int shiftNe = BIT_PER_DIGIT - shiftBits;
-
+    ll carry = 0;
+    ll sum = 0;
+    int n = size();
     BigInteger ans;
     ans.sign = sign;
-    ans.digits.resize(digits.size() + shiftUnits + 1, 0);
-
-    int carry = 0;
-    ll sum = 0;
-    for (int j = 0; j < digits.size(); j++) {
-        ll temp = getFirstKBits(digits[j], shiftNe);
-        ans.digits[j + shiftUnits] |= (temp << shiftBits);
-        temp = (digits[j] >> shiftNe);
-        if (j == digits.size() - 1) {
-            ans.digits[j + shiftUnits + 1] = temp;
+    ans.digits.resize(n + i);
+    for (int j = 0; j < n; j++) {
+        if (j == 0) {
+            // i = 2
+            // n = n1{10} n2{011} 
+            // n << 2 = n1{1} n2{001} n3{100} 
+            
+            carry = digits[j] >> (BIT_PER_DIGIT - i); // get the first i bits
+            carry = carry & ((1ll << i) - 1); // set the first i bits to 1
+            ans.digits[j] = digits[j] << i; 
         } else {
-            ans.digits[j + shiftUnits + 1] = temp | carry;
-            carry = 0;
+            ll temp = carry;
+            carry = digits[j] >> (BIT_PER_DIGIT - i);
+            carry = carry & ((1ll << i) - 1);
+            ans.digits[j] = (digits[j] << i) | temp;
         }
     }
+    ans.digits[n] = carry;
     ans.trim();
     return ans;
 }
@@ -468,9 +482,11 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
     return Ans{a, b, d};
 }
 
-int msbPosition(ll x) {
+int msbPosition(ll x)
+{
     int res = 0;
-    while (x > 0) {
+    while (x > 0)
+    {
         x >>= 1;
         res++;
     }
@@ -504,29 +520,30 @@ auto divide(const BigInteger &a, const BigInteger &b) {
     int n = x.size();
     int m = y.size();
 
-    if (n < m) {
-        return res{BigInteger("0"), x};
+    if (x < y) { 
+    // 9 : 10 => 0 : 9
+    // -9 : 10 => 0 : -9
+    // 9 : -10 => 0 : 9
+        return res{BigInteger("0"), a};
     }
 
-    // code to divide two numbers
-    int shift = BIT_PER_DIGIT + 1;
-    while (x >= y) {
-        int msbX = 0, msbY = 0;
-        msbX = msbPosition(x.getDigits().back());
-        msbY = msbPosition(y.getDigits().back());
-        int cShift = msbX - msbY + (x.size() - y.size()) * BIT_PER_DIGIT;
-        shift = min(shift - 1, cShift);
+    while(answer.remainder >=y) {
+        
+        int msb_x = msbPosition(answer.remainder.digits.back());
+        int msb_y = msbPosition(y.digits.back());
+        int shift = msb_x - msb_y + (int)(answer.remainder.size() - y.size()) * BIT_PER_DIGIT;
 
-        BigInteger shiftedY = y << shift;
-        while (shiftedY > x)
-            shift--, shiftedY = y << shift;
+        BigInteger shifted_y = y << shift;
 
-        x = x - shiftedY;
+        while (answer.remainder < shifted_y) {
+            shift--;
+            shifted_y = y << shift;
+        }
+
+        answer.remainder = answer.remainder - shifted_y;
         answer.quotient = answer.quotient + (BigInteger("1") << shift);
     }
-
-    answer.remainder = x;
-
+    
     if(answer.quotient.is_zero()) {
         answer.quotient = BigInteger("0");
     }
@@ -561,7 +578,7 @@ bool Miller_Rabin_check(const BigInteger &n) {
 
     int Primes_size = sizeof(Primes) / sizeof(Primes[0]);
 
-    for (int i = 0; i < 10; i++) {
+    for (int i = 0; i < 5; i++) {
         BigInteger a((ll)Primes[rand() % Primes_size]);
 
         BigInteger x = a.powMod(d, n);

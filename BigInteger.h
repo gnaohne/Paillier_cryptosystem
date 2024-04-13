@@ -38,9 +38,9 @@ private:
 public:
     BigInteger();
 
-    explicit BigInteger(const string &s);
+    BigInteger(const string &s);
 
-    explicit BigInteger(ll l);
+    BigInteger(TYPE l);
 
     BigInteger(const BigInteger &other);
 
@@ -96,6 +96,8 @@ public:
 
     BigInteger powMod(const BigInteger &a, const BigInteger &mod) const;
 };
+
+int msbPosition(ll x);
 
 auto bezout(const BigInteger &x, const BigInteger &y);
 

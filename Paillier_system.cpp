@@ -27,8 +27,11 @@ auto keyGen()
     cout << "q: " << q.toString() << endl;
 
     ans.n = p * q;
+    cout << "n: " << ans.n.toString() << endl;
 
-    BigInteger phi = (p - BigInteger(1)) * (q - BigInteger(1));
+    BigInteger p_1 = p - BigInteger(1);
+    BigInteger q_1 = q - BigInteger(1);
+    BigInteger phi = p_1 * q_1;
 
     // i wanna check gcd(n,(p-1)(q-1)) == 1 use bezout function
     BigInteger gcd_n_phin = bezout(ans.n, phi).d;
@@ -39,7 +42,7 @@ auto keyGen()
     }
     
     // d = lcm((p-1),(q-1))
-    ans.d = lcm(p - BigInteger(1), q - BigInteger(1));
+    ans.d = lcm(p_1, q_1);
     cout << "d: " << ans.d.toString() << endl;
 
     // g = random in Zn^2
