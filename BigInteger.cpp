@@ -519,7 +519,7 @@ auto divide(const BigInteger &a, const BigInteger &b) {
         return res{BigInteger("0"), a};
     }
 
-    while(answer.remainder >=y) {
+    while(answer.remainder >= b) {
         
         int msb_x = msbPosition(answer.remainder.getDigits().back());
         int msb_y = msbPosition(y.getDigits().back());
@@ -531,8 +531,12 @@ auto divide(const BigInteger &a, const BigInteger &b) {
             shift--;
             shifted_y = y << shift;
         }
-    
+        
+        cout << "Shifted y: " << shifted_y.toString() << endl;
+        
         answer.remainder = answer.remainder - shifted_y;
+        cout << "Remainder: " << answer.remainder.toString() << endl;
+
         answer.quotient = answer.quotient + (BigInteger("1") << shift);
     }
     
