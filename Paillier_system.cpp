@@ -60,6 +60,8 @@ auto keyGen()
 
     BigInteger mu = mod_inverse(L, ans.n);
 
+    cout << "Done generating key" << endl;
+
     return ans;
 }
 
@@ -71,35 +73,54 @@ BigInteger random_in_Zn2(BigInteger n)
     // for example p and q is 128 bit so n is 256 bit => n^2 is 512 bit
     // so i wanna g is 512 bit and gcd(g,n^2) = 1
     
+    std::mt19937_64 rng(std::random_device{}()); 
+    std::uniform_int_distribution<uint64_t> dist(0, 1); 
+
     auto start = chrono::high_resolution_clock::now();
 
     int bit_size = KEY_SIZE * 4; 
 
-    string binary = "1";
+    // string binary = "1";
 
-    for(int i = 1; i < bit_size; i++)
-    {
-        binary += (rand() % 2) ? '1' : '0';
-    }
+    // for(int i = 1; i < bit_size; i++)
+    // {
+    //     binary += (rand() % 2) ? '1' : '0';
+    // }
 
-    BigInteger g(binary);
+    // BigInteger g(binary);
 
-    BigInteger gcd_g_n2 = bezout(g, n * n).d;
+    // BigInteger gcd_g_n2 = bezout(g, n * n).d;
 
-    while(gcd_g_n2 != BigInteger(1))
-    {
-        cout << "Generating g..." << endl;
-        binary = "1";
+    // while(gcd_g_n2 != BigInteger(1))
+    // {
+    //     cout << "Generating g..." << endl;
+    //     binary = "1";
 
-        for(int i = 1; i < bit_size; i++)
+    //     for(int i = 1; i < bit_size; i++)
+    //     {
+    //         binary += (rand() % 2) ? '1' : '0';
+    //     }
+
+    //     g = BigInteger(binary);
+
+    //     gcd_g_n2 = bezout(g, n * n).d;
+    // }
+
+    BigInteger g;
+
+    do {
+        string binary = "1";
+        for(int i = 1; i < bit_size - 1; i++)
         {
-            binary += (rand() % 2) ? '1' : '0';
+            binary += std::to_string(dist(rng));
         }
+
+        binary += "1";
 
         g = BigInteger(binary);
 
-        gcd_g_n2 = bezout(g, n * n).d;
-    }
+    } while (bezout(g, n * n).d != BigInteger(1));
+    
 
     auto end = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);

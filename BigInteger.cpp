@@ -660,22 +660,21 @@ string hex_to_bin(const string &hex) {
 
 BigInteger generate_large_prime(int bit_length)
 {
+    std::mt19937_64 rng(std::random_device{}()); 
+    std::uniform_int_distribution<uint64_t> dist(0, 1); 
+
     auto start = chrono::high_resolution_clock::now();
-    srand(time(0));
-    string binary = "1";
-    for (int i = 1; i < bit_length - 1; i++) {
-        binary += (rand() % 2) ? '1' : '0';
-    }
-    binary += "1";
-    BigInteger n(binary);
-    while (!Miller_Rabin_check(n)) {
-        binary = "1";
+    
+    BigInteger n;
+    do {
+        string binary = "1";
         for (int i = 1; i < bit_length - 1; i++) {
-            binary += (rand() % 2) ? '1' : '0';
+            binary += std::to_string(dist(rng)); 
         }
         binary += "1";
         n = BigInteger(binary);
-    }
+    } while (!Miller_Rabin_check(n));
+
     auto end = chrono::high_resolution_clock::now();
     chrono::duration<double> duration = end - start;
     cout << "Time generate large prime: " << duration.count() << "s" << endl;

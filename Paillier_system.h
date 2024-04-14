@@ -3,6 +3,7 @@
 
 #include "BigInteger.h"
 #include <chrono>
+#include <random>
 
 #define KEY_SIZE 128
 
