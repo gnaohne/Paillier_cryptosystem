@@ -348,30 +348,22 @@ BigInteger BigInteger::operator<<(int i) {
     }
     
     if (i == 0) return *this;
+    
+    int digitShift = i / BIT_PER_DIGIT; // number of digits to shift
+    int bitShift = i % BIT_PER_DIGIT; // number of bits to shift
 
-    ll carry = 0;
-    ll sum = 0;
-    int n = size();
     BigInteger ans;
     ans.sign = sign;
-    ans.digits.resize(n + i);
-    for (int j = 0; j < n; j++) {
-        if (j == 0) {
-            // i = 2
-            // n = n1{10} n2{011} 
-            // n << 2 = n1{1} n2{001} n3{100} 
-            
-            carry = digits[j] >> (BIT_PER_DIGIT - i); // get the first i bits
-            carry = carry & ((1ll << i) - 1); // set the first i bits to 1
-            ans.digits[j] = digits[j] << i; 
-        } else {
-            ll temp = carry;
-            carry = digits[j] >> (BIT_PER_DIGIT - i);
-            carry = carry & ((1ll << i) - 1);
-            ans.digits[j] = (digits[j] << i) | temp;
+    ans.digits.resize(digits.size() + digitShift + 1, 0);
+    
+    for (int j = 0; j < digits.size(); j++) {
+        ans.digits[j + digitShift] |= digits[j] << bitShift; // shift left
+        if (j + digitShift + 1 < ans.digits.size()) {
+            // put the last bit of the current number to the first bit of the next number
+            ans.digits[j + digitShift + 1] |= digits[j] >> (BIT_PER_DIGIT - bitShift);
         }
     }
-    ans.digits[n] = carry;
+
     ans.trim();
     return ans;
 }
@@ -529,8 +521,8 @@ auto divide(const BigInteger &a, const BigInteger &b) {
 
     while(answer.remainder >=y) {
         
-        int msb_x = msbPosition(answer.remainder.digits.back());
-        int msb_y = msbPosition(y.digits.back());
+        int msb_x = msbPosition(answer.remainder.getDigits().back());
+        int msb_y = msbPosition(y.getDigits().back());
         int shift = msb_x - msb_y + (int)(answer.remainder.size() - y.size()) * BIT_PER_DIGIT;
 
         BigInteger shifted_y = y << shift;
@@ -539,7 +531,7 @@ auto divide(const BigInteger &a, const BigInteger &b) {
             shift--;
             shifted_y = y << shift;
         }
-
+    
         answer.remainder = answer.remainder - shifted_y;
         answer.quotient = answer.quotient + (BigInteger("1") << shift);
     }

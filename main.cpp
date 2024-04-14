@@ -18,8 +18,6 @@ int main() {
     // std::chrono::duration<double> duration = end - start;
     // cout << "Time: " << duration.count() << "s" << endl;
 
-    
-
     auto key = keyGen();
     cout << "n: " << key.n.toString() << endl;
     cout << "g: " << key.g.toString() << endl;
