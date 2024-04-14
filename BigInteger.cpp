@@ -660,6 +660,7 @@ string hex_to_bin(const string &hex) {
 
 BigInteger generate_large_prime(int bit_length)
 {
+    auto start = chrono::high_resolution_clock::now();
     srand(time(0));
     string binary = "1";
     for (int i = 1; i < bit_length - 1; i++) {
@@ -675,6 +676,9 @@ BigInteger generate_large_prime(int bit_length)
         binary += "1";
         n = BigInteger(binary);
     }
+    auto end = chrono::high_resolution_clock::now();
+    chrono::duration<double> duration = end - start;
+    cout << "Time generate large prime: " << duration.count() << "s" << endl;
     return n;
 }
 

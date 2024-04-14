@@ -14,16 +14,18 @@ auto keyGen()
 
     cout << "Generating p..." << endl;
     BigInteger p = generate_large_prime(KEY_SIZE);
+    cout << "p: " << p.toString() << endl;
+
     
     cout << "Generating q..." << endl;
     BigInteger q = generate_large_prime(KEY_SIZE);
 
     while(q == p)
     {
+        cout << "Generating q again..." << endl;
         q = generate_large_prime(KEY_SIZE);
     }
 
-    cout << "p: " << p.toString() << endl;
     cout << "q: " << q.toString() << endl;
 
     ans.n = p * q;
@@ -33,7 +35,7 @@ auto keyGen()
     BigInteger q_1 = q - BigInteger(1);
     BigInteger phi = p_1 * q_1;
 
-    // i wanna check gcd(n,(p-1)(q-1)) == 1 use bezout function
+    // check gcd(n,(p-1)(q-1)) == 1 use bezout function
     BigInteger gcd_n_phin = bezout(ans.n, phi).d;
 
     while(gcd_n_phin != BigInteger(1))
@@ -48,6 +50,7 @@ auto keyGen()
     // g = random in Zn^2
     cout << "Generating g..." << endl;
     ans.g = random_in_Zn2(ans.n);
+    cout << "g: " << ans.g.toString() << endl;
 
     // mu = (L(g^d mod n2))^-1 (mod n) with L(x)=(x-1)/n
     
