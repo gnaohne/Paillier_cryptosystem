@@ -5,8 +5,8 @@
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
     
-    BigInteger a("111101011001011000110111111111011001110001010001100000101110000");
-    BigInteger b(4);
+    // BigInteger a("111101011001011000110111111111011001110001010001100000101110000");
+    // BigInteger b(4);
     
     // b = b << (253);
 
@@ -18,12 +18,20 @@ int main() {
 
     // cout << "a - b = " << c.toString() << endl;
 
-    auto c = divide(a, b);
+    // auto c = divide(a, b);
+    // BigInteger temp = b << 60;
+    // cout << "a = " << a.toString() << endl;
+    // cout << "temp = " << temp.toString() << endl;
+
+    // BigInteger e("11101011001011000110111111111011001110001010001100000101110000");
+
+    // BigInteger d = a - temp;
+    // cout << "a - temp = " << d.toString() << endl;
 
     // cout << "a / b = " << c.quotient.toString() << endl;
     // cout << "a % b = " << c.remainder.toString() << endl;
-
-    // auto key = keyGen();
+    
+    auto key = keyGen();
     
     // BigInteger n("101011001011000110111111111011001110001010001100000101110000");
     

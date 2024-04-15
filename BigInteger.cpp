@@ -149,7 +149,7 @@ BigInteger BigInteger::operator+(const BigInteger &a) const {
         for (int i = 0; i < n; i++) {
             sum = carry + digits[i];
             if (i < m) sum -= a.digits[i];
-            if (sum < 0) {
+            if (sum < 0) { 
                 sum += BASE;
                 carry = -1;
             } else {
@@ -181,7 +181,7 @@ BigInteger BigInteger::operator+(const BigInteger &a) const {
 BigInteger BigInteger::operator-(const BigInteger &a) const {
     BigInteger temp(a);
     temp.sign = -temp.sign;
-    return *this + temp;
+    return *this + temp; 
 }
 
 void BigInteger::trim() {
@@ -531,12 +531,8 @@ auto divide(const BigInteger &a, const BigInteger &b) {
             shift--;
             shifted_y = y << shift;
         }
-        
-        cout << "Shifted y: " << shifted_y.toString() << endl;
-        
+                
         answer.remainder = answer.remainder - shifted_y;
-        cout << "Remainder: " << answer.remainder.toString() << endl;
-
         answer.quotient = answer.quotient + (BigInteger("1") << shift);
     }
     
