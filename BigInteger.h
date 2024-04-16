@@ -15,7 +15,7 @@
 using namespace std;
 
 #define ll long long
-const int BIT_PER_DIGIT = 63;
+const int BIT_PER_DIGIT = 61;
 const ll BASE = 1ll << BIT_PER_DIGIT;
 
 using TYPE = ll;

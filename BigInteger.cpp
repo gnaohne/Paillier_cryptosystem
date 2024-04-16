@@ -357,7 +357,8 @@ BigInteger BigInteger::operator<<(int i) {
     ans.digits.resize(digits.size() + digitShift + 1, 0);
     
     for (int j = 0; j < digits.size(); j++) {
-        ans.digits[j + digitShift] |= digits[j] << bitShift; // shift left
+        ans.digits[j + digitShift] |= (digits[j] & ((1 << (BIT_PER_DIGIT - bitShift)) - 1)) << bitShift;
+        
         if (j + digitShift + 1 < ans.digits.size()) {
             // put the last bit of the current number to the first bit of the next number
             ans.digits[j + digitShift + 1] |= digits[j] >> (BIT_PER_DIGIT - bitShift);
