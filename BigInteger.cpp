@@ -357,11 +357,14 @@ BigInteger BigInteger::operator<<(int i) {
     ans.digits.resize(digits.size() + digitShift + 1, 0);
     
     for (int j = 0; j < digits.size(); j++) {
-        ans.digits[j + digitShift] |= digits[j] << bitShift;
-        
+        // Apply the bit shift and mask to ensure values stay within BIT_PER_DIGIT bits
+        ll lower_part = (digits[j] << bitShift) & (BASE - 1);
+        ans.digits[j + digitShift] |= lower_part;
+
         if (j + digitShift + 1 < ans.digits.size()) {
-            // put the last bit of the current number to the first bit of the next number
-            ans.digits[j + digitShift + 1] |= digits[j] >> (BIT_PER_DIGIT - bitShift);
+            // Calculate the upper part that will spill over to the next digit
+            ll upper_part = digits[j] >> (BIT_PER_DIGIT - bitShift);
+            ans.digits[j + digitShift + 1] |= upper_part;
         }
     }
 
