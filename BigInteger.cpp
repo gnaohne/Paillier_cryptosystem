@@ -453,11 +453,11 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
     reverse(x_binary.begin(), x_binary.end());
     reverse(y_binary.begin(), y_binary.end());
 
-    int g = 0;
+    int g_count = 0;
     int i = 0, j = 0;
 
     while (i < x_binary.size() && j < y_binary.size() && x_binary[i] == '0' && y_binary[i] == '0') {
-        g++;
+        g_count++;
         i++;
         j++;
     }
@@ -465,6 +465,8 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
     temp_x = temp_x >> i;
 
     temp_y = temp_y >> j;
+
+    BigInteger g = BigInteger("1") << g_count;
 
     BigInteger u(x);
     BigInteger v(y);
@@ -482,9 +484,9 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
                 B = B >> 1;
             } else {
                 A = (A + y) >> 1;
-                A %= y;
+                // A %= y;
                 B = (B - x) >> 1;
-                B %= y;
+                // B %= y;
             }
 
         }
@@ -496,9 +498,9 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
                 D = D >> 1;
             } else {
                 C = (C + y) >> 1;
-                C %= y;
+                // C %= y;
                 D = (D - x) >> 1;
-                D %= y;
+                // D %= y;
             }
         }
 
@@ -516,7 +518,7 @@ auto bezout(const BigInteger &x, const BigInteger &y) {
     BigInteger a = C;
     BigInteger b = D;
     BigInteger d = v;
-    d = d << g;
+    d = d * g;
 
     a.setSign(a.getSign() * sign_x);
     b.setSign(b.getSign() * sign_y);
