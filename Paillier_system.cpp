@@ -109,24 +109,14 @@ BigInteger random_in_Zn(BigInteger n)
 BigInteger encrypt(const BigInteger &m, const BigInteger &n, const BigInteger &g)
 {
     BigInteger r = random_in_Zn(n);
-    cout << "r: " << r.toString() << endl;
-    cout << "r: " << r.toDecimal() << endl;
 
     BigInteger n2 = n * n;
-    cout << "n^2: " << n2.toString() << endl;
-    cout << "n^2: " << n2.toDecimal() << endl;
 
     BigInteger g_m = g.powMod(m, n2);
-    cout << "g^m (mod n^2): " << g_m.toString() << endl;
-    cout << "g^m (mod n^2): " << g_m.toDecimal() << endl;
 
     BigInteger r_n = r.powMod(n, n2);
-    cout << "r^n (mod n^2): " << r_n.toString() << endl;
-    cout << "r^n (mod n^2): " << r_n.toDecimal() << endl;
 
     BigInteger c = g_m.mulMod(r_n, n2);
-    cout << "c: " << c.toString() << endl;
-    cout << "c: " << c.toDecimal() << endl;
 
     return c;
 }
@@ -134,33 +124,19 @@ BigInteger encrypt(const BigInteger &m, const BigInteger &n, const BigInteger &g
 BigInteger decrypt(const BigInteger &c, const BigInteger &n, const BigInteger &d, const BigInteger &g)
 {
     BigInteger n2 = n * n;
-    cout << "n^2: " << n2.toString() << endl;
-    cout << "n^2: " << n2.toDecimal() << endl;
-
+    
     BigInteger g_d = g.powMod(d, n2);
-    cout << "g^d (mod n^2): " << g_d.toString() << endl;
-    cout << "g^d (mod n^2): " << g_d.toDecimal() << endl;
 
     BigInteger L = divide((g_d - BigInteger(1)), n).quotient;
-    cout << "L: " << L.toString() << endl;
-    cout << "L: " << L.toDecimal() << endl;
 
     BigInteger mu = mod_inverse(L, n);
-    cout << "mu: " << mu.toString() << endl;
-    cout << "mu: " << mu.toDecimal() << endl;
 
     // m = mu.L(c^d mod n2) mod n
     BigInteger c_d = c.powMod(d, n2);
-    cout << "c^d (mod n^2): " << c_d.toString() << endl;
-    cout << "c^d (mod n^2): " << c_d.toDecimal() << endl;
 
     BigInteger L_c_d = divide((c_d - BigInteger(1)), n).quotient;
-    cout << "L(c^d mod n^2): " << L_c_d.toString() << endl;
-    cout << "L(c^d mod n^2): " << L_c_d.toDecimal() << endl;
-
+   
     BigInteger m = mu.mulMod(L_c_d, n);
-    cout << "m: " << m.toString() << endl;
-    cout << "m: " << m.toDecimal() << endl;
 
     return m;
 }

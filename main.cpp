@@ -4,15 +4,6 @@
 
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
-   
-
-    // string message;
-    // cout << "Enter the message: ";
-    // getline(cin, message);
-
-    // string binary = message_to_binary(message);
-    // cout << "Binary message: " << binary << endl;
-    // binary = "1" + binary;
 
     BigInteger mess("1001");
 
@@ -24,9 +15,9 @@ int main() {
     cout << "Decrypting..." << endl;
     BigInteger m = decrypt(c, key.n, key.d, key.g);
 
-    string decrypted_message = binary_to_message(m.toString());
+    string message = m.toString();
 
-    cout << "Decrypted message: " << decrypted_message << endl;
+    cout << "Decrypted message: " << message << endl;
 
 
     auto end = std::chrono::high_resolution_clock::now();

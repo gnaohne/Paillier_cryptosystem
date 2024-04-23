@@ -733,16 +733,10 @@ BigInteger mod_inverse(const BigInteger &a, const BigInteger &n)
     auto ans = bezout(a, n);
 
     BigInteger x = ans.a;
-    cout << "x: " << x.toString() << endl;
-    cout << "x: " << x.toDecimal() << endl;
 
     BigInteger y = ans.b;
-    cout << "y: " << y.toString() << endl;
-    cout << "y: " << y.toDecimal() << endl;
 
     BigInteger d = ans.d;
-    cout << "d: " << d.toString() << endl;
-    cout << "d: " << d.toDecimal() << endl;
 
     if (x.getSign() == -1) {
         x = x + n;
