@@ -15,4 +15,6 @@ BigInteger random_in_Zn(BigInteger n);
 
 BigInteger encrypt(const BigInteger &m, const BigInteger &n, const BigInteger &g);
 
+BigInteger decrypt(const BigInteger &c, const BigInteger &n, const BigInteger &d, const BigInteger &g); // d = lamda
+
 #endif //PAILLIER_CRYPTOSYSTEM_H

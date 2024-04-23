@@ -298,6 +298,21 @@ BigInteger BigInteger::powMod(const BigInteger &a, const BigInteger &mod) const 
     return res;
 }
 
+int BigInteger::bitLength() const
+{
+    if (is_zero()) return 0;
+    int n = size();
+    int res = (n - 1) * BIT_PER_DIGIT;
+    int i = n - 1;
+    while (i >= 0 && digits[i] == 0) {
+        i--;
+    }
+    if (i >= 0) {
+        res += msbPosition(digits[i]);
+    }
+    return res;
+}
+
 BigInteger BigInteger::operator>>(int i) { 
     if (i < 0) {
         throw "Shift right must be positive";
@@ -687,16 +702,10 @@ BigInteger generate_large_prime(int bit_length)
 
 BigInteger mod_inverse(const BigInteger &a, const BigInteger &n)
 {
-    auto start = chrono::high_resolution_clock::now();
-
     BigInteger x = bezout(a, n).a;
     if (x.getSign() == -1) {
         x = x + n;
     }
-
-    auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double> duration = end - start;
-    cout << "Time calculate modulo inverse: " << duration.count() << "s" << endl;
 
     return x;
 }

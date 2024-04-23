@@ -96,6 +96,8 @@ public:
     BigInteger mulMod(const BigInteger &other, const BigInteger &mod) const;
 
     BigInteger powMod(const BigInteger &a, const BigInteger &mod) const;
+
+    int bitLength() const;
 };
 
 int msbPosition(ll x);

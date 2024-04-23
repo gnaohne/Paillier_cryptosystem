@@ -9,20 +9,16 @@ auto keyGen()
         
         BigInteger d;
     };
-    cout << "Generating key..." << endl;
     key ans;
 
-    cout << "Generating p..." << endl;
     BigInteger p = generate_large_prime(KEY_SIZE);
     cout << "p: " << p.toString() << endl;
 
     
-    cout << "Generating q..." << endl;
     BigInteger q = generate_large_prime(KEY_SIZE);
 
     while(q == p)
     {
-        cout << "Generating q again..." << endl;
         q = generate_large_prime(KEY_SIZE);
     }
 
@@ -35,7 +31,6 @@ auto keyGen()
     BigInteger q_1 = q - BigInteger(1);
     BigInteger phi = p_1 * q_1;
 
-    // check gcd(n,(p-1)(q-1)) == 1 use bezout function
     BigInteger gcd_n_phin = bezout(ans.n, phi).d;
 
     while(gcd_n_phin != BigInteger(1))
@@ -43,7 +38,6 @@ auto keyGen()
         q = generate_large_prime(KEY_SIZE);
     }
     
-    // d = lcm((p-1),(q-1))
     ans.d = lcm(p_1, q_1);
     cout << "d: " << ans.d.toString() << endl;
 
@@ -54,11 +48,11 @@ auto keyGen()
 
     // mu = (L(g^d mod n2))^-1 (mod n) with L(x)=(x-1)/n
     
-    BigInteger g_d = ans.g.powMod(ans.d, ans.n * ans.n);
+    // BigInteger g_d = ans.g.powMod(ans.d, ans.n * ans.n);
 
-    BigInteger L = divide((g_d - BigInteger(1)), ans.n).quotient;
+    // BigInteger L = divide((g_d - BigInteger(1)), ans.n).quotient;
 
-    BigInteger mu = mod_inverse(L, ans.n);
+    // BigInteger mu = mod_inverse(L, ans.n);
 
     cout << "Done generating key" << endl;
 
@@ -66,51 +60,17 @@ auto keyGen()
 }
 
 BigInteger random_in_Zn2(BigInteger n)
-{
-    // i wanna g is random number in Zn^2 so g have the same bit with n^2 and satisfy gcd(g,n^2) = 1 
-    // it means g is generator of Zn^2
-    // n = p*q => n^2 = p^2 * q^2 => bit(n^2) = 2*bit(n)
-    // for example p and q is 128 bit so n is 256 bit => n^2 is 512 bit
-    // so i wanna g is 512 bit and gcd(g,n^2) = 1
-    
+{    
     std::mt19937_64 rng(std::random_device{}()); 
     std::uniform_int_distribution<uint64_t> dist(0, 1); 
 
-    auto start = chrono::high_resolution_clock::now();
-
-    int bit_size = KEY_SIZE * 4; 
-
-    // string binary = "1";
-
-    // for(int i = 1; i < bit_size; i++)
-    // {
-    //     binary += (rand() % 2) ? '1' : '0';
-    // }
-
-    // BigInteger g(binary);
-
-    // BigInteger gcd_g_n2 = bezout(g, n * n).d;
-
-    // while(gcd_g_n2 != BigInteger(1))
-    // {
-    //     cout << "Generating g..." << endl;
-    //     binary = "1";
-
-    //     for(int i = 1; i < bit_size; i++)
-    //     {
-    //         binary += (rand() % 2) ? '1' : '0';
-    //     }
-
-    //     g = BigInteger(binary);
-
-    //     gcd_g_n2 = bezout(g, n * n).d;
-    // }
+    int bit_size = n.bitLength() * 2; 
 
     BigInteger g;
 
     do {
-        string binary = "1";
-        for(int i = 1; i < bit_size - 1; i++)
+        string binary;
+        for(int i = 0; i < bit_size - 1; i++)
         {
             binary += std::to_string(dist(rng));
         }
@@ -120,11 +80,55 @@ BigInteger random_in_Zn2(BigInteger n)
         g = BigInteger(binary);
 
     } while (bezout(g, n * n).d != BigInteger(1));
-    
-
-    auto end = chrono::high_resolution_clock::now();
-    auto duration = chrono::duration_cast<chrono::milliseconds>(end - start);
-
-    cout << "Time to generate g: " << duration.count() << " ms" << endl;
     return g;
+}
+
+BigInteger random_in_Zn(BigInteger n)
+{
+    std::mt19937_64 rng(std::random_device{}()); 
+    std::uniform_int_distribution<uint64_t> dist(0, 1); 
+
+    BigInteger r;
+
+    int n_bit_size = n.bitLength();
+
+    do {
+        string binary;
+        for(int i = 0; i < n_bit_size - 1; i++)
+        {
+            binary += std::to_string(dist(rng));
+        }
+
+        binary += "1";
+
+        r = BigInteger(binary);
+
+    } while (bezout(r, n * n).d != BigInteger(1));
+    return r;
+}
+
+BigInteger encrypt(const BigInteger &m, const BigInteger &n, const BigInteger &g)
+{
+    BigInteger r = random_in_Zn(n);
+    BigInteger n2 = n * n;
+    BigInteger c = g.powMod(m,n2) * r.powMod(n,n2);
+    c = c.mod(n2);
+    return c;
+}
+
+BigInteger decrypt(const BigInteger &c, const BigInteger &n, const BigInteger &d, const BigInteger &g)
+{
+    BigInteger n2 = n * n;
+    // mu = (L(g^d mod n2))^-1 (mod n) with L(x)=(x-1)/n
+
+    BigInteger g_d = g.powMod(d, n2);
+    BigInteger L = divide((g_d - BigInteger(1)), n).quotient;
+    BigInteger mu = mod_inverse(L, n);
+
+    // m = mu.L(c^d mod n2) mod n
+    BigInteger c_d = c.powMod(d, n2);
+    BigInteger L_c_d = divide((c_d - BigInteger(1)), n).quotient;
+    BigInteger m = (mu * L_c_d).mod(n);
+
+    return m;
 }
