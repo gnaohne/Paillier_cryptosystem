@@ -313,6 +313,37 @@ int BigInteger::bitLength() const
     return res;
 }
 
+string BigInteger::toDecimal() const
+{
+    if (is_zero()) return "0";
+    string binary = toString();
+    if (binary[0] == '-') {
+        binary = binary.substr(1);
+    }
+    string decimal;
+    int n = binary.size();
+    int i = 0;
+    while (i < n) {
+        int carry = 0;
+        for (int j = i; j < n; j++) {
+            int digit = binary[j] - '0';
+            digit += carry * 2;
+            carry = digit % 10;
+            digit /= 10;
+            binary[j] = digit + '0';
+        }
+        decimal += carry + '0';
+        while (i < n && binary[i] == '0') {
+            i++;
+        }
+    }
+    reverse(decimal.begin(), decimal.end());
+    if (sign == -1) {
+        decimal = '-' + decimal;
+    }
+    return decimal;
+}
+
 BigInteger BigInteger::operator>>(int i) { 
     if (i < 0) {
         throw "Shift right must be positive";
@@ -681,8 +712,6 @@ BigInteger generate_large_prime(int bit_length)
 {
     std::mt19937_64 rng(std::random_device{}()); 
     std::uniform_int_distribution<uint64_t> dist(0, 1); 
-
-    auto start = chrono::high_resolution_clock::now();
     
     BigInteger n;
     do {
@@ -694,15 +723,25 @@ BigInteger generate_large_prime(int bit_length)
         n = BigInteger(binary);
     } while (!Miller_Rabin_check(n));
 
-    auto end = chrono::high_resolution_clock::now();
-    chrono::duration<double> duration = end - start;
-    cout << "Time generate large prime: " << duration.count() << "s" << endl;
     return n;
 }
 
 BigInteger mod_inverse(const BigInteger &a, const BigInteger &n)
 {
-    BigInteger x = bezout(a, n).a;
+    auto ans = bezout(a, n);
+
+    BigInteger x = ans.a;
+    cout << "x: " << x.toString() << endl;
+    cout << "x: " << x.toDecimal() << endl;
+
+    BigInteger y = ans.b;
+    cout << "y: " << y.toString() << endl;
+    cout << "y: " << y.toDecimal() << endl;
+
+    BigInteger d = ans.d;
+    cout << "d: " << d.toString() << endl;
+    cout << "d: " << d.toDecimal() << endl;
+
     if (x.getSign() == -1) {
         x = x + n;
     }
