@@ -5,7 +5,7 @@
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    BigInteger mess("1001");
+    BigInteger mess("100101001");
 
     auto key = keyGen();
 
@@ -18,7 +18,7 @@ int main() {
     string message = m.toString();
 
     cout << "Decrypted message: " << message << endl;
-
+    cout << "Original message : " << mess.toString() << endl;
 
     auto end = std::chrono::high_resolution_clock::now();
     std::chrono::duration<double> duration = end - start;
