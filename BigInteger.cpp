@@ -744,3 +744,23 @@ BigInteger mod_inverse(const BigInteger &a, const BigInteger &n)
 
     return x;
 }
+
+string string_to_binary(const string &s)
+{
+    string binary;
+    for (char const &c : s) {
+        binary += bitset<8>(c).to_string();
+    }
+    return binary;
+}
+
+string binary_to_string(const string &s)
+{
+    string text;
+    for (size_t i = 0; i < s.size(); i += 8) {
+        std::bitset<8> bits(s.substr(i, 8));
+        char character = static_cast<char>(bits.to_ulong());
+        text += character;
+    }
+    return text;
+}

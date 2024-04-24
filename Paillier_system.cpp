@@ -13,6 +13,7 @@ auto keyGen()
 
     BigInteger p = generate_large_prime(KEY_SIZE);
     cout << "p: " << p.toString() << endl;
+    cout << "p: " << p.toDecimal() <<endl;
 
     
     BigInteger q = generate_large_prime(KEY_SIZE);
@@ -23,9 +24,13 @@ auto keyGen()
     }
 
     cout << "q: " << q.toString() << endl;
+    cout << "q: " << q.toDecimal() <<endl;
+    cout << endl;
 
     ans.n = p * q;
     cout << "n: " << ans.n.toString() << endl;
+    cout << "n: " << ans.n.toDecimal() <<endl;
+    cout << endl;
 
     BigInteger p_1 = p - BigInteger(1);
     BigInteger q_1 = q - BigInteger(1);
@@ -40,10 +45,14 @@ auto keyGen()
     
     ans.d = lcm(p_1, q_1);
     cout << "d: " << ans.d.toString() << endl;
+    cout << "d: " << ans.d.toDecimal() <<endl;
+    cout << endl;
 
     // g = random in Zn^2
     ans.g = random_in_Zn2(ans.n);
     cout << "g: " << ans.g.toString() << endl;
+    cout << "g: " << ans.g.toDecimal() <<endl;
+    cout << endl;
 
     // mu = (L(g^d mod n2))^-1 (mod n) with L(x)=(x-1)/n
     

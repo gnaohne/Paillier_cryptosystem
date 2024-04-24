@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <chrono>
 #include <random>
+#include <bitset>
 
 using namespace std;
 
@@ -117,5 +118,10 @@ string hex_to_bin(const string &hex);
 BigInteger generate_large_prime(int bit_length);
 
 BigInteger mod_inverse(const BigInteger &a, const BigInteger &n);
+
+string string_to_binary(const string &s);
+
+string binary_to_string(const string &s);
+
 
 #endif //PAILLIER_CRYPTOSYSTEM_BIGINTEGER_H
