@@ -47,27 +47,14 @@ RealNumber RealNumber::operator+(const RealNumber &other)
     // y = c * 10^{-5}
     int diff = exponent - other.exponent;
     if (diff > 0)
-    {
-        
-        int i = diff % (BIT_PER_DIGIT - 4);
-        diff /= (BIT_PER_DIGIT - 4);
-        BigInteger temp = BigInteger(n) * BigInteger(pow(10, i));
-        for (int j = 0; j < diff; j++)
-        {
-            temp = temp * BigInteger(pow(10, BIT_PER_DIGIT - 4));
-        }
-        temp = temp + other.n;
+    {  
+        BigInteger temp = n;
+        temp = temp + other.n * BigInteger(10).pow(diff);
         return RealNumber(temp, other.exponent);
     }
     diff = -diff;
-    int i = diff % (BIT_PER_DIGIT - 4);
-    diff /= (BIT_PER_DIGIT - 4);
-    BigInteger temp = BigInteger(other.n) * BigInteger(pow(10, i));
-    for (int j = 0; j < diff; j++)
-    {
-        temp = temp * BigInteger(pow(10, BIT_PER_DIGIT - 4));
-    }
-    temp = temp + n;
+    BigInteger temp = other.n;
+    temp = temp + n * BigInteger(10).pow(diff);
     return RealNumber(temp, exponent);
 }
 
@@ -106,12 +93,12 @@ string RealNumber::toDecimalString()
     return res;
 }
 
-int RealNumber::getExponent()
+int RealNumber::getExponent() const
 {
     return exponent;
 }
 
-BigInteger RealNumber::getN()
+BigInteger RealNumber::getN() const
 {
     return n;
 }

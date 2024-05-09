@@ -64,9 +64,9 @@ auto keyGen()
 
     BigInteger L = divide((g_d - BigInteger(1)), ans.n).quotient;
 
-    BigInteger mu = mod_inverse(L, ans.n);
-    cout << "mu: " << mu.toString() << endl;
-    cout << "mu: " << mu.toDecimal() <<endl;
+    ans.mu = mod_inverse(L, ans.n);
+    cout << "mu: " << ans.mu.toString() << endl;
+    cout << "mu: " << ans.mu.toDecimal() <<endl;
 
     cout << "Done generating key" << endl;
 
@@ -139,6 +139,8 @@ BigInteger encrypt(const BigInteger &m, const BigInteger &n, const BigInteger &g
 BigInteger decrypt(const BigInteger &c, const BigInteger &n, const BigInteger &d, const BigInteger &mu)
 {
     // m = mu.L(c^d mod n2) mod n
+    BigInteger n2 = n * n;
+
     BigInteger c_d = c.powMod(d, n2);
 
     BigInteger L_c_d = divide((c_d - BigInteger(1)), n).quotient;
@@ -194,6 +196,8 @@ RealNumber decrypt(const RealNumber &c, const BigInteger &n, const BigInteger &d
 {
     // m = mu.L(c^d mod n2) mod n
     BigInteger c_n = c.getN();
+
+    BigInteger n2 = n * n;
 
     BigInteger c_d = c_n.powMod(d, n2);
 

@@ -19,9 +19,9 @@ public:
     RealNumber operator-(const RealNumber& other);
     RealNumber operator*(const RealNumber& other);
     string toDecimalString();
-    
-    int getExponent();
-    BigInteger getN();
+
+    int getExponent() const;
+    BigInteger getN() const;
     void setN(BigInteger n);
     void setExponent(int exponent);
 };

@@ -298,6 +298,25 @@ BigInteger BigInteger::powMod(const BigInteger &a, const BigInteger &mod) const 
     return res;
 }
 
+BigInteger BigInteger::pow(int n) const
+{
+    BigInteger res("1");
+    BigInteger temp(*this);
+    if (n == 0) return res;
+    if (n == 1) return temp;
+
+    while (n)
+    {
+        if (n%2 == 1)
+        {
+            res = res * temp;
+        }
+        temp = temp * temp;
+        n /= 2;
+    }
+    return res;
+}
+
 int BigInteger::bitLength() const
 {
     if (is_zero()) return 0;
@@ -735,7 +754,7 @@ BigInteger mod_inverse(const BigInteger &a, const BigInteger &n)
     if (ans.d != BigInteger("1")) {
         throw "Modular inverse does not exist";
     }
-    
+
     BigInteger x = ans.a;
 
     BigInteger y = ans.b;

@@ -98,6 +98,8 @@ public:
 
     BigInteger powMod(const BigInteger &a, const BigInteger &mod) const;
 
+    BigInteger pow(int n) const;
+
     int bitLength() const;
 
     string toDecimal() const;

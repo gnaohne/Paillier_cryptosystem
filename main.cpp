@@ -28,7 +28,7 @@ int main() {
 
     // cout << "--------------------------------------------------------" << endl;
     // cout << "Decrypting..." << endl;
-    // BigInteger m = decrypt(c, key.n, key.d, key.g);
+    // BigInteger m = decrypt(c, key.n, key.d, key.mu);
 
     // string message = m.toString();
     // message = message.substr(1);
@@ -42,24 +42,22 @@ int main() {
     // std::chrono::duration<double> duration = end - start;
     // cout << "Time: " << duration.count() << "s" << endl;
 
-    string a;
+    RealNumber m("3.1416");
 
-    cout << "Enter a number: ";
+    cout << "m = " << m.toDecimalString() << endl;
 
-    getline(cin, a);
-
-    RealNumber x(a);
+    cout << "--------------------------------------------------------" << endl;
+    cout << "Generating key..." << endl;
+    auto key = keyGen();
     
-    cout << x.toDecimalString() << endl;
+    cout << "Encrypting..." << endl;
+    RealNumber c = encrypt(m, key.n, key.g);
+    cout << "Encrypt : c = " << c.toDecimalString() << endl;
 
-    string b;
-    cout << "Enter another number: ";
-    getline(cin, b);
+    cout << "--------------------------------------------------------" << endl;
+    cout << "Decrypting..." << endl;
+    RealNumber m_decrypt = decrypt(c, key.n, key.d, key.mu);
+    cout << "Decrypt : m = " << m_decrypt.toDecimalString() << endl;
 
-    RealNumber y(b);
-
-    RealNumber z = x + y;
-
-    cout << z.toDecimalString() << endl;
     return 0;
 }

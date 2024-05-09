@@ -2,6 +2,7 @@
 #define PAILLIER_CRYPTOSYSTEM_H
 
 #include "BigInteger.h"
+#include "RealNumber.h"
 #include <chrono>
 #include <random>
 #include <string>
