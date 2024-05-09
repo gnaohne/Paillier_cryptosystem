@@ -48,13 +48,13 @@ RealNumber RealNumber::operator+(const RealNumber &other)
     int diff = exponent - other.exponent;
     if (diff > 0)
     {  
-        BigInteger temp = n;
-        temp = temp + other.n * BigInteger(10).pow(diff);
+        BigInteger temp = other.n;
+        temp = temp + n * BigInteger(10).pow(diff);
         return RealNumber(temp, other.exponent);
     }
     diff = -diff;
-    BigInteger temp = other.n;
-    temp = temp + n * BigInteger(10).pow(diff);
+    BigInteger temp = n;
+    temp = temp + other.n * BigInteger(10).pow(diff);
     return RealNumber(temp, exponent);
 }
 
@@ -84,6 +84,10 @@ string RealNumber::toDecimalString()
         else
         {
             res.insert(i, ".");
+            if (res[0] == '.')
+            {
+                res = "0" + res;
+            }
         }
     }
     else
