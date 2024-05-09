@@ -731,7 +731,11 @@ BigInteger generate_large_prime(int bit_length)
 BigInteger mod_inverse(const BigInteger &a, const BigInteger &n)
 {
     auto ans = bezout(a, n);
-
+    
+    if (ans.d != BigInteger("1")) {
+        throw "Modular inverse does not exist";
+    }
+    
     BigInteger x = ans.a;
 
     BigInteger y = ans.b;

@@ -42,7 +42,24 @@ int main() {
     // std::chrono::duration<double> duration = end - start;
     // cout << "Time: " << duration.count() << "s" << endl;
 
-    
+    string a;
 
+    cout << "Enter a number: ";
+
+    getline(cin, a);
+
+    RealNumber x(a);
+    
+    cout << x.toDecimalString() << endl;
+
+    string b;
+    cout << "Enter another number: ";
+    getline(cin, b);
+
+    RealNumber y(b);
+
+    RealNumber z = x + y;
+
+    cout << z.toDecimalString() << endl;
     return 0;
 }

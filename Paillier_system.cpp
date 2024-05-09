@@ -4,10 +4,13 @@ auto keyGen()
 {
     struct key
     {
+        // public key
         BigInteger n;
         BigInteger g;
         
+        // private key
         BigInteger d;
+        BigInteger mu;
     };
     key ans;
 
@@ -53,14 +56,17 @@ auto keyGen()
     cout << "g: " << ans.g.toString() << endl;
     cout << "g: " << ans.g.toDecimal() <<endl;
     cout << endl;
-
-    // mu = (L(g^d mod n2))^-1 (mod n) with L(x)=(x-1)/n
     
-    // BigInteger g_d = ans.g.powMod(ans.d, ans.n * ans.n);
+    // mu = (L(g^d mod n2))^-1 (mod n) with L(x)=(x-1)/n
+    BigInteger n2 = ans.n * ans.n;
 
-    // BigInteger L = divide((g_d - BigInteger(1)), ans.n).quotient;
+    BigInteger g_d = ans.g.powMod(ans.d, n2);
 
-    // BigInteger mu = mod_inverse(L, ans.n);
+    BigInteger L = divide((g_d - BigInteger(1)), ans.n).quotient;
+
+    BigInteger mu = mod_inverse(L, ans.n);
+    cout << "mu: " << mu.toString() << endl;
+    cout << "mu: " << mu.toDecimal() <<endl;
 
     cout << "Done generating key" << endl;
 
@@ -130,16 +136,8 @@ BigInteger encrypt(const BigInteger &m, const BigInteger &n, const BigInteger &g
     return c;
 }
 
-BigInteger decrypt(const BigInteger &c, const BigInteger &n, const BigInteger &d, const BigInteger &g)
+BigInteger decrypt(const BigInteger &c, const BigInteger &n, const BigInteger &d, const BigInteger &mu)
 {
-    BigInteger n2 = n * n;
-    
-    BigInteger g_d = g.powMod(d, n2);
-
-    BigInteger L = divide((g_d - BigInteger(1)), n).quotient;
-
-    BigInteger mu = mod_inverse(L, n);
-
     // m = mu.L(c^d mod n2) mod n
     BigInteger c_d = c.powMod(d, n2);
 
@@ -170,4 +168,40 @@ string binary_to_message(const string &binary)
         message += c;
     }
     return message;
+}
+
+RealNumber encrypt(const RealNumber &m, const BigInteger &n, const BigInteger &g)
+{
+    // c = g^m mod n2 * r^n mod n2
+    BigInteger m_n = m.getN();
+
+    BigInteger r = random_in_Zn(n);
+
+    BigInteger n2 = n * n;
+
+    BigInteger g_m = g.powMod(m_n, n2);
+
+    BigInteger r_n = r.powMod(n, n2);
+
+    BigInteger c = g_m.mulMod(r_n, n2);
+
+    RealNumber c_real(c, m.getExponent());
+
+    return c_real;
+}
+
+RealNumber decrypt(const RealNumber &c, const BigInteger &n, const BigInteger &d, const BigInteger &mu)
+{
+    // m = mu.L(c^d mod n2) mod n
+    BigInteger c_n = c.getN();
+
+    BigInteger c_d = c_n.powMod(d, n2);
+
+    BigInteger L_c_d = divide((c_d - BigInteger(1)), n).quotient;
+   
+    BigInteger m = mu.mulMod(L_c_d, n);
+
+    RealNumber m_real(m, c.getExponent());
+
+    return m_real;
 }

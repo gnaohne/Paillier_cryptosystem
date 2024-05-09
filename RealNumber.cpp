@@ -22,6 +22,25 @@ RealNumber::RealNumber(double n)
     this->n = BigInteger(n);
 }
 
+RealNumber::RealNumber(string double_string)
+{
+    int i = 0;
+    while (i < double_string.size() && double_string[i] != '.')
+    {
+        i++;
+    }
+    if (i == double_string.size())
+    {
+        n = BigInteger(stoll(double_string, nullptr, 10));
+        exponent = 0;
+    }
+    else
+    {
+        n = BigInteger(stoll(double_string.substr(0, i) + double_string.substr(i + 1), nullptr, 10));
+        exponent = i - double_string.size() + 1;
+    }
+}
+
 RealNumber RealNumber::operator+(const RealNumber &other)
 {
     // x = a * 10^{-2}
@@ -32,30 +51,30 @@ RealNumber RealNumber::operator+(const RealNumber &other)
         
         int i = diff % (BIT_PER_DIGIT - 4);
         diff /= (BIT_PER_DIGIT - 4);
-        BigInteger temp = BigInteger(n) * BigInteger(10.pow(i));
+        BigInteger temp = BigInteger(n) * BigInteger(pow(10, i));
         for (int j = 0; j < diff; j++)
         {
-            temp = temp * BigInteger(10.pow(BIT_PER_DIGIT - 4));
+            temp = temp * BigInteger(pow(10, BIT_PER_DIGIT - 4));
         }
-        temp += other.n;
+        temp = temp + other.n;
         return RealNumber(temp, other.exponent);
     }
     diff = -diff;
     int i = diff % (BIT_PER_DIGIT - 4);
     diff /= (BIT_PER_DIGIT - 4);
-    BigInteger temp = BigInteger(other.n) * BigInteger(10.pow(i));
+    BigInteger temp = BigInteger(other.n) * BigInteger(pow(10, i));
     for (int j = 0; j < diff; j++)
     {
-        temp = temp * BigInteger(10.pow(BIT_PER_DIGIT - 4));
+        temp = temp * BigInteger(pow(10, BIT_PER_DIGIT - 4));
     }
-    temp += n;
+    temp = temp + n;
     return RealNumber(temp, exponent);
 }
 
 RealNumber RealNumber::operator-(const RealNumber &other)
 {
     RealNumber temp = other;
-    temp.n.sign = -temp.n.sign;
+    temp.n.setSign(-temp.n.getSign());
     return *this + temp;
 }
 
@@ -85,4 +104,24 @@ string RealNumber::toDecimalString()
         res += string(exponent, '0');
     }
     return res;
+}
+
+int RealNumber::getExponent()
+{
+    return exponent;
+}
+
+BigInteger RealNumber::getN()
+{
+    return n;
+}
+
+void RealNumber::setN(BigInteger n)
+{
+    this->n = n;
+}
+
+void RealNumber::setExponent(int exponent)
+{
+    this->exponent = exponent;
 }
