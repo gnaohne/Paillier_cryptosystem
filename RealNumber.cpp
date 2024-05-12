@@ -77,7 +77,7 @@ RealNumber::RealNumber(string float_string, int type)
     double value = mantissa_value * pow(2, exp) * sign;
     // convert double to string without to_string and i don't want rounding
     stringstream ss;
-    ss << std::fixed << std::setprecision(64) << value;
+    ss << std::fixed << std::setprecision(17) << value;
     string double_string = ss.str();
     
     // cout << double_string << endl;
@@ -134,12 +134,14 @@ RealNumber RealNumber::operator*(const RealNumber &other)
 string RealNumber::toDecimalString()
 {
     int sign = n.getSign();
+
+    BigInteger temp = n;
     if (sign == -1)
     {
-        n = n.abs();
+        temp = n.abs();
     }
 
-    string res = n.toDecimal();
+    string res = temp.toDecimal();
     if (exponent < 0)
     {
         int i = res.size() + exponent;

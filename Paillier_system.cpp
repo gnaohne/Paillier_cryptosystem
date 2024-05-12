@@ -15,10 +15,9 @@ auto keyGen()
     key ans;
 
     BigInteger p = generate_large_prime(KEY_SIZE);
-    cout << "p: " << p.toString() << endl;
-    cout << "p: " << p.toDecimal() <<endl;
+    // cout << "p: " << p.toString() << endl;
+    // cout << "p: " << p.toDecimal() <<endl;
 
-    
     BigInteger q = generate_large_prime(KEY_SIZE);
 
     while(q == p)
@@ -26,14 +25,14 @@ auto keyGen()
         q = generate_large_prime(KEY_SIZE);
     }
 
-    cout << "q: " << q.toString() << endl;
-    cout << "q: " << q.toDecimal() <<endl;
-    cout << endl;
+    // cout << "q: " << q.toString() << endl;
+    // cout << "q: " << q.toDecimal() <<endl;
+    // cout << endl;
 
     ans.n = p * q;
-    cout << "n: " << ans.n.toString() << endl;
-    cout << "n: " << ans.n.toDecimal() <<endl;
-    cout << endl;
+    // cout << "n: " << ans.n.toString() << endl;
+    // cout << "n: " << ans.n.toDecimal() <<endl;
+    // cout << endl;
 
     BigInteger p_1 = p - BigInteger(1);
     BigInteger q_1 = q - BigInteger(1);
@@ -47,15 +46,15 @@ auto keyGen()
     }
     
     ans.d = lcm(p_1, q_1);
-    cout << "d: " << ans.d.toString() << endl;
-    cout << "d: " << ans.d.toDecimal() <<endl;
-    cout << endl;
+    // cout << "d: " << ans.d.toString() << endl;
+    // cout << "d: " << ans.d.toDecimal() <<endl;
+    // cout << endl;
 
     // g = random in Zn^2
     ans.g = random_in_Zn2(ans.n);
-    cout << "g: " << ans.g.toString() << endl;
-    cout << "g: " << ans.g.toDecimal() <<endl;
-    cout << endl;
+    // cout << "g: " << ans.g.toString() << endl;
+    // cout << "g: " << ans.g.toDecimal() <<endl;
+    // cout << endl;
     
     // mu = (L(g^d mod n2))^-1 (mod n) with L(x)=(x-1)/n
     BigInteger n2 = ans.n * ans.n;
@@ -65,10 +64,10 @@ auto keyGen()
     BigInteger L = divide((g_d - BigInteger(1)), ans.n).quotient;
 
     ans.mu = mod_inverse(L, ans.n);
-    cout << "mu: " << ans.mu.toString() << endl;
-    cout << "mu: " << ans.mu.toDecimal() <<endl;
+    // cout << "mu: " << ans.mu.toString() << endl;
+    // cout << "mu: " << ans.mu.toDecimal() <<endl;
 
-    cout << "Done generating key" << endl;
+    // cout << "Done generating key" << endl;
 
     return ans;
 }
@@ -174,6 +173,8 @@ string binary_to_message(const string &binary)
 
 RealNumber encrypt(const RealNumber &m, const BigInteger &n, const BigInteger &g)
 {
+    int sign = m.getN().getSign();
+
     // c = g^m mod n2 * r^n mod n2
     BigInteger m_n = m.getN();
 
@@ -186,6 +187,7 @@ RealNumber encrypt(const RealNumber &m, const BigInteger &n, const BigInteger &g
     BigInteger r_n = r.powMod(n, n2);
 
     BigInteger c = g_m.mulMod(r_n, n2);
+    c.setSign(sign);
 
     RealNumber c_real(c, m.getExponent());
 
@@ -194,6 +196,8 @@ RealNumber encrypt(const RealNumber &m, const BigInteger &n, const BigInteger &g
 
 RealNumber decrypt(const RealNumber &c, const BigInteger &n, const BigInteger &d, const BigInteger &mu)
 {
+    int sign = c.getN().getSign();
+
     // m = mu.L(c^d mod n2) mod n
     BigInteger c_n = c.getN();
 
@@ -204,7 +208,8 @@ RealNumber decrypt(const RealNumber &c, const BigInteger &n, const BigInteger &d
     BigInteger L_c_d = divide((c_d - BigInteger(1)), n).quotient;
    
     BigInteger m = mu.mulMod(L_c_d, n);
-
+    m.setSign(sign);
+    
     RealNumber m_real(m, c.getExponent());
 
     return m_real;
