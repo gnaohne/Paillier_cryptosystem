@@ -14,6 +14,7 @@ public:
     RealNumber(BigInteger n, int exponent);
     RealNumber(double n);
     RealNumber(string double_string);
+    RealNumber(string float_string, int type);
     
     RealNumber operator+(const RealNumber& other);
     RealNumber operator-(const RealNumber& other);

@@ -41,6 +41,42 @@ RealNumber::RealNumber(string double_string)
     }
 }
 
+RealNumber::RealNumber(string float_string, int type)
+{
+    // type = 1: float point 16
+    // type = 2: float point 32
+
+    int sign = (float_string[0] == '1') ? -1 : 1;
+
+    int exp_bits = (type == 1) ? 5 : 8;
+
+    int bias = (type == 1) ? 15 : 127;
+
+
+    string exp_str = float_string.substr(1, exp);
+    
+    int exponent = 0;
+
+    for (int i = 0; i < exp_bits; i++)
+    {
+        exponent = (exponent << 1) | (exp_str[i] - '0');
+    }
+
+    exponent -= bias;
+
+    string frac_str = float_string.substr(1 + exp_bits);
+
+    long long frac = 0;
+
+    for (int i = 0; i < frac_str.size(); i++)
+    {
+        frac = (frac << 1) | (frac_str[i] - '0');
+    }
+
+    this->exponent = exponent;
+    this->n = BigInteger(frac);
+}
+
 RealNumber RealNumber::operator+(const RealNumber &other)
 {
     // x = a * 10^{-2}
