@@ -47,7 +47,6 @@ RealNumber::RealNumber(string float_string, int type)
     // type = 2: float point 32
 
     int sign = (float_string[0] == '1') ? -1 : 1;
-    n.setSign(sign);
 
     int exp_bits = (type == 1) ? 5 : 8;
 
@@ -75,8 +74,13 @@ RealNumber::RealNumber(string float_string, int type)
         factor /= 2;
     }
 
-    double value = mantissa_value * pow(2, exp);
-    string double_string = to_string(value);
+    double value = mantissa_value * pow(2, exp) * sign;
+    // convert double to string without to_string and i don't want rounding
+    stringstream ss;
+    ss << std::fixed << std::setprecision(64) << value;
+    string double_string = ss.str();
+    
+    // cout << double_string << endl;
 
     while (double_string.back() == '0')
     {
@@ -129,6 +133,12 @@ RealNumber RealNumber::operator*(const RealNumber &other)
 
 string RealNumber::toDecimalString()
 {
+    int sign = n.getSign();
+    if (sign == -1)
+    {
+        n = n.abs();
+    }
+
     string res = n.toDecimal();
     if (exponent < 0)
     {
@@ -149,6 +159,11 @@ string RealNumber::toDecimalString()
     else
     {
         res += string(exponent, '0');
+    }
+
+    if (sign == -1)
+    {
+        res = "-" + res;
     }
     return res;
 }
@@ -171,4 +186,26 @@ void RealNumber::setN(BigInteger n)
 void RealNumber::setExponent(int exponent)
 {
     this->exponent = exponent;
+}
+
+string random_FP16()
+{
+    srand(time(0));
+    string res = "";
+    for (int i = 0; i < 16; i++)
+    {
+        res += to_string(rand() % 2);
+    }
+    return res;
+}
+
+string random_FP32()
+{
+    srand(time(0));
+    string res = "";
+    for (int i = 0; i < 32; i++)
+    {
+        res += to_string(rand() % 2);
+    }
+    return res;
 }

@@ -4,6 +4,9 @@
 #include "BigInteger.h"
 #include <string>
 #include <algorithm>
+#include <sstream>
+#include <iomanip>
+#include <random>
 
 #define FP16 1
 #define FP32 2
@@ -29,5 +32,7 @@ public:
     void setN(BigInteger n);
     void setExponent(int exponent);
 };
+string random_FP16();
+string random_FP32();
 
 #endif //PAILLIER_CRYPTOSYSTEM_REALNUMBER_H
