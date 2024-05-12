@@ -5,6 +5,9 @@
 #include <string>
 #include <algorithm>
 
+#define FP16 1
+#define FP32 2
+
 class RealNumber {
 private:
     BigInteger n;

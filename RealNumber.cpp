@@ -24,57 +24,77 @@ RealNumber::RealNumber(double n)
 
 RealNumber::RealNumber(string double_string)
 {
-    int i = 0;
-    while (i < double_string.size() && double_string[i] != '.')
-    {
-        i++;
-    }
-    if (i == double_string.size())
+    int pos = double_string.find('.');
+
+    if (pos == string::npos)
     {
         n = BigInteger(stoll(double_string, nullptr, 10));
         exponent = 0;
     }
     else
     {
-        n = BigInteger(stoll(double_string.substr(0, i) + double_string.substr(i + 1), nullptr, 10));
-        exponent = i - double_string.size() + 1;
+        n = BigInteger(stoll(double_string.substr(0, pos) + double_string.substr(pos + 1), nullptr, 10));
+        exponent = pos - double_string.size() + 1;
     }
 }
 
 RealNumber::RealNumber(string float_string, int type)
 {
+    // float_string in binary
+    // sign | exp | mantissa
+
     // type = 1: float point 16
     // type = 2: float point 32
 
     int sign = (float_string[0] == '1') ? -1 : 1;
+    n.setSign(sign);
 
     int exp_bits = (type == 1) ? 5 : 8;
 
     int bias = (type == 1) ? 15 : 127;
 
+    int exp = 0;
+    for (int i = 1; i <= exp_bits; i++)
+    {
+        exp = exp * 2 + (float_string[i] - '0');
+    }
+    exp -= bias;
 
-    string exp_str = float_string.substr(1, exp);
+    string mantissa = float_string.substr(exp_bits + 1);
+
+    double mantissa_value = 1.0;
     
-    int exponent = 0;
-
-    for (int i = 0; i < exp_bits; i++)
+    double factor = 0.5; 
+    
+    for (int i = 0; i < mantissa.size(); i++)
     {
-        exponent = (exponent << 1) | (exp_str[i] - '0');
+        if (mantissa[i] == '1')
+        {
+            mantissa_value += factor;
+        }
+        factor /= 2;
     }
 
-    exponent -= bias;
+    double value = mantissa_value * pow(2, exp);
+    string double_string = to_string(value);
 
-    string frac_str = float_string.substr(1 + exp_bits);
-
-    long long frac = 0;
-
-    for (int i = 0; i < frac_str.size(); i++)
+    while (double_string.back() == '0')
     {
-        frac = (frac << 1) | (frac_str[i] - '0');
+        double_string.pop_back();
     }
 
-    this->exponent = exponent;
-    this->n = BigInteger(frac);
+    int pos = double_string.find('.');
+
+    if (pos == string::npos)
+    {
+        n = BigInteger(stoll(double_string, nullptr, 10));
+        exponent = 0;
+    }
+    else
+    {
+        n = BigInteger(stoll(double_string.substr(0, pos) + double_string.substr(pos + 1), nullptr, 10));
+        exponent = pos - double_string.size() + 1;
+    }
 }
 
 RealNumber RealNumber::operator+(const RealNumber &other)
