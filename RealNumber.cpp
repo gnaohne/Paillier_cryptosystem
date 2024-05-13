@@ -74,14 +74,21 @@ RealNumber::RealNumber(string float_string, int type)
         factor /= 2;
     }
 
-    double value = mantissa_value * pow(2, exp) * sign;
-    // convert double to string without to_string and i don't want rounding
+    double value = mantissa_value * pow(2, exp);
+    
     stringstream ss;
-    ss << std::fixed << std::setprecision(17) << value;
+
+    if (type == 1)
+    {
+        ss << std::fixed << std::setprecision(PrecisionFP16) << value;
+    }
+    else
+    {
+        ss << std::fixed << std::setprecision(PrecisionFP32) << value;
+    }
+    
     string double_string = ss.str();
     
-    // cout << double_string << endl;
-
     while (double_string.back() == '0')
     {
         double_string.pop_back();
@@ -91,12 +98,13 @@ RealNumber::RealNumber(string float_string, int type)
 
     if (pos == string::npos)
     {
-        n = BigInteger(stoll(double_string, nullptr, 10));
+        n = BigInteger(double_string, 10, sign);
         exponent = 0;
     }
     else
     {
-        n = BigInteger(stoll(double_string.substr(0, pos) + double_string.substr(pos + 1), nullptr, 10));
+        string temp = double_string.substr(0, pos) + double_string.substr(pos + 1);
+        n = BigInteger(temp, 10, sign);
         exponent = pos - double_string.size() + 1;
     }
 }

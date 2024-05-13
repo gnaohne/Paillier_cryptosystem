@@ -10,6 +10,8 @@
 
 #define FP16 1
 #define FP32 2
+#define PrecisionFP16 15 // 15 decimal places
+#define PrecisionFP32 38 // 31 decimal places
 
 class RealNumber {
 private:

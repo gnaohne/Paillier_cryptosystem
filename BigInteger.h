@@ -42,6 +42,8 @@ public:
 
     BigInteger(const string &s);
 
+    BigInteger(const string  &s, int base, int sign);
+
     BigInteger(TYPE l);
 
     BigInteger(const BigInteger &other);

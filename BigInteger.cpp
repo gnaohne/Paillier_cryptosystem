@@ -31,6 +31,25 @@ BigInteger::BigInteger(const string &s) {
     this->trim();
 }
 
+BigInteger::BigInteger(const string &s, int base, int sign)
+{
+    this->sign = sign;
+    string temp = s;
+
+    reverse(temp.begin(), temp.end());
+    
+    BigInteger base_num(base);
+
+    BigInteger temp_num("0");
+
+    for (int i = 0; i< temp.size(); i++) {
+        string c = to_string(temp[i] - '0');
+        temp_num = temp_num + base_num.pow(i) * BigInteger(stoll(c));
+    }
+
+    digits = temp_num.getDigits();
+}
+
 BigInteger::BigInteger(TYPE l) {
     if (l < 0) {
         sign = -1;
