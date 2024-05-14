@@ -8,7 +8,7 @@
 #include <string>
 #include <bitset>
 
-#define KEY_SIZE 256
+#define KEY_SIZE 512
 
 auto keyGen();
 
