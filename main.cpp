@@ -6,7 +6,7 @@
 
 int main() {
     ofstream file;
-    file.open("time_fp16_512_ver00.txt");
+    file.open("time_fp32_512_ver00.txt");
     if (!file) {
         cout << "Unable to open file";
         exit(1);
@@ -23,9 +23,9 @@ int main() {
 
     for (int i = 0; i < 100; i++) {
         file << "Test " << i + 1 << endl;
-        string rand = random_FP16();
+        string rand = random_FP32();
         file << "Random number: " << rand << endl;
-        RealNumber m(rand, FP16);
+        RealNumber m(rand, FP32);
         
         file << "Real number: " << m.toDecimalString() << endl;
 
