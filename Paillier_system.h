@@ -8,24 +8,28 @@
 #include <string>
 #include <bitset>
 
-#define KEY_SIZE 512
-
-auto keyGen();
+#define KEY_SIZE 128
 
 BigInteger random_in_Zn2(BigInteger n);
 
 BigInteger random_in_Zn(BigInteger n);
 
-BigInteger encrypt(const BigInteger &m, const BigInteger &n, const BigInteger &g);
-
-BigInteger decrypt(const BigInteger &c, const BigInteger &n, const BigInteger &d, const BigInteger &mu); // d = lamda
-
 string message_to_binary(const string &message);
 
 string binary_to_message(const string &binary);
 
-RealNumber encrypt(const RealNumber &m, const BigInteger &n, const BigInteger &g);
+class Pailler_sys {
+private:
+    BigInteger n, g; // public key
+    BigInteger lamda, mu; // private key
+public: 
+    void keyGen();
+    Pailler_sys();
+    BigInteger getN();
+    BigInteger getG();
 
-RealNumber decrypt(const RealNumber &c, const BigInteger &n, const BigInteger &d, const BigInteger &mu);
+    RealNumber encrypt(const RealNumber &m);
+    RealNumber decrypt(const RealNumber &c);
+};
 
 #endif //PAILLIER_CRYPTOSYSTEM_H
