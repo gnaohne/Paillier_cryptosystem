@@ -111,8 +111,6 @@ RealNumber::RealNumber(string float_string, int type)
 
 RealNumber RealNumber::operator+(const RealNumber &other)
 {
-    // x = a * 10^{-2}
-    // y = c * 10^{-5}
     int diff = exponent - other.exponent;
     if (diff > 0)
     {  
